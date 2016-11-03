@@ -9,4 +9,4 @@ export ENV_NAME_MYSQL_DATABASE=MYSQL_DATABASE
 export ENV_NAME_MYSQL_USER=MYSQL_USER
 export ENV_NAME_MYSQL_PASSWORD=MYSQL_PASSWORD
 export LOG_LEVEL=debug
-datafoundry_data_integration
+./datafoundry_data_integration

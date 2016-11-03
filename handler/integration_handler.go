@@ -62,25 +62,44 @@ func init() {
 func CreateRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	logger.Info("Request url: POST %v.", r.URL)
 
-	api.JsonResult(w, http.StatusBadRequest, api.GetError(ErrorCodeNone), nil)
+	api.JsonResult(w, http.StatusBadRequest, api.GetError(api.ErrorCodeNone), nil)
 }
 
 func QueryRepoListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	logger.Info("Request url: POST %v.", r.URL)
 
-	api.JsonResult(w, http.StatusBadRequest, api.GetError(ErrorCodeNone), nil)
+	data := `{
+			"total":2,
+			"results":[
+			{
+				"repo_name":"北京空气质量",
+				"class":"气象环保",
+				"label":"公开数据",
+				"description":"北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。"
+
+			},
+			{
+				"repo_name":"上海空气质量",
+				"class":"气象环保",
+				"label":"公开数据",
+				"description":"北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。"
+			}
+			]
+		}`
+
+	api.JsonResult(w, http.StatusOK, api.GetError(api.ErrorCodeNone), data)
 }
 
 func QueryRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	logger.Info("Request url: POST %v.", r.URL)
 
-	api.JsonResult(w, http.StatusBadRequest, api.GetError(ErrorCodeNone), nil)
+	api.JsonResult(w, http.StatusBadRequest, api.GetError(api.ErrorCodeNone), nil)
 }
 
 func QueryDataItemHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	logger.Info("Request url: POST %v.", r.URL)
 
-	api.JsonResult(w, http.StatusBadRequest, api.GetError(ErrorCodeNone), nil)
+	api.JsonResult(w, http.StatusBadRequest, api.GetError(api.ErrorCodeNone), nil)
 }
 
 func DoRecharge(w http.ResponseWriter, r *http.Request, params httprouter.Params) {

@@ -184,6 +184,7 @@ func (upgrader DatabaseUpgrader_Base) TryToCreateTables(db *sql.DB) error {
 	for _, sql := range sqls {
 		_, err = db.Exec(string(sql))
 		if err != nil {
+			fmt.Printf("----init sql:%s-----%v\n", sql, err)
 			return err
 		}
 	}
