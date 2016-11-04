@@ -65,8 +65,8 @@ func NewRouter(router *httprouter.Router) {
 	logger.Info("new router.")
 	router.POST("/integration/v1/repository", api.TimeoutHandle(35000*time.Millisecond, handler.CreateRepoHandler))
 	router.GET("/integration/v1/repositories", api.TimeoutHandle(35000*time.Millisecond, handler.QueryRepoListHandler))
-	router.GET("/integration/v1/repository", api.TimeoutHandle(35000*time.Millisecond, handler.QueryRepoHandler))
-	router.GET("/integration/v1/dataitem", api.TimeoutHandle(35000*time.Millisecond, handler.QueryDataItemHandler))
+	router.GET("/integration/v1/repository/:reponame", api.TimeoutHandle(35000*time.Millisecond, handler.QueryRepoHandler))
+	router.GET("/integration/v1/dataitem/:reponame/:itemname", api.TimeoutHandle(35000*time.Millisecond, handler.QueryDataItemHandler))
 
 	//router.GET("/saasappapi/v1/apps", api.TimeoutHandle(500*time.Millisecond, QueryAppList))
 }

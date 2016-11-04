@@ -62,12 +62,64 @@ func init() {
 func CreateRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	logger.Info("Request url: POST %v.", r.URL)
 
-	api.JsonResult(w, http.StatusBadRequest, api.GetError(api.ErrorCodeNone), nil)
+	logger.Info("Begin do CreateRepo handler.")
+	defer logger.Info("End do recharge handler.")
+
+
+	db := models.GetDB()
+	if db == nil {
+		logger.Warn("Get db is nil.")
+		api.JsonResult(w, http.StatusInternalServerError, api.GetError(api.ErrorCodeDbNotInitlized), nil)
+		return
+	}
+
+	repo := &models.Repository{}
+	err := common.ParseRequestJsonInto(r, repo)
+	if err != nil {
+		logger.Error("Parse body err: %v", err)
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeParseJsonFailed, err.Error()), nil)
+		return
+	}
+
+	repo.Status = "A"
+
+	err = models.RecordRepo(db, repo)
+	if err != nil {
+		logger.Error("Record repository err: %v", err)
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeRecordRecharge, err.Error()), nil)
+		return
+	}
+
+	api.JsonResult(w, http.StatusOK, nil,nil)
 }
 
 func QueryRepoListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	logger.Info("Request url: POST %v.", r.URL)
-
+	//logger.Info("Request url: GET %v.", r.URL)
+	//
+	//logger.Info("Begin get RepoList handler.")
+	//defer logger.Info("End get RepoList handler.")
+	//
+	//db := models.GetDB()
+	//if db == nil {
+	//	logger.Warn("Get db is nil.")
+	//	api.JsonResult(w, http.StatusInternalServerError, api.GetError(api.ErrorCodeDbNotInitlized), nil)
+	//	return
+	//}
+	//
+	//r.ParseForm()
+	//
+	//offset, size := api.OptionalOffsetAndSize(r, 30, 1, 1000)
+	//orderBy := models.ValidateOrderBy(r.Form.Get("orderby"))
+	//class := r.Form.Get("class")
+	//label := r.Form.Get("label")
+	//reponame := r.Form.Get("reponame")
+	//
+	//count, repos, err := models.QueryRepoList(db, class, label, reponame, orderBy, offset, size)
+	//if err != nil {
+	//	api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeQueryTransactions, err.Error()), nil)
+	//	return
+	//}
+	//api.JsonResult(w, http.StatusOK, nil, api.NewQueryListResult(count, repos))
 	data := `{
 			"total":2,
 			"results":[
@@ -91,15 +143,82 @@ func QueryRepoListHandler(w http.ResponseWriter, r *http.Request, params httprou
 }
 
 func QueryRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	logger.Info("Request url: POST %v.", r.URL)
+	logger.Info("Request url: GET %v.", r.URL)
 
-	api.JsonResult(w, http.StatusBadRequest, api.GetError(api.ErrorCodeNone), nil)
+	logger.Info("Begin get Repo handler.")
+	defer logger.Info("End get Repo handler.")
+
+	db := models.GetDB()
+	if db == nil {
+		logger.Warn("Get db is nil.")
+		api.JsonResult(w, http.StatusInternalServerError, api.GetError(api.ErrorCodeDbNotInitlized), nil)
+		return
+	}
+
+	repoName := params.ByName("reponame")
+	if repoName == "" {
+		logger.Warn("repoName is nil")
+		api.JsonResult(w, http.StatusBadRequest, api.GetError(api.ErrorCodeNone), nil)
+	}
+
+	repo ,err := models.QueryRepo(db, repoName)
+	if err != nil {
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeQueryTransactions, err.Error()), nil)
+		return
+	}
+	items,err := models.QueryItemList(db,repoName)
+	if err != nil {
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeQueryTransactions, err.Error()), nil)
+		return
+	}
+
+	var res struct {
+		*models.Repository
+		items          []*models.Dataitem  `json:"items"`
+	}
+
+	res.Repository = repo
+	res.items = items
+	api.JsonResult(w, http.StatusOK, nil, res)
 }
 
 func QueryDataItemHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	logger.Info("Request url: POST %v.", r.URL)
+	logger.Info("Request url: GET %v.", r.URL)
 
-	api.JsonResult(w, http.StatusBadRequest, api.GetError(api.ErrorCodeNone), nil)
+	logger.Info("Begin get DataItem handler.")
+	defer logger.Info("End get DataItem handler.")
+
+	db := models.GetDB()
+	if db == nil {
+		logger.Warn("Get db is nil.")
+		api.JsonResult(w, http.StatusInternalServerError, api.GetError(api.ErrorCodeDbNotInitlized), nil)
+		return
+	}
+
+	itemName := params.ByName("itemname")
+	repoName := params.ByName("reponame")
+
+	item ,err := models.QueryItem(db,repoName,itemName)
+	if err != nil {
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeQueryTransactions, err.Error()), nil)
+		return
+	}
+	itemId := item.ItemId
+	attrs ,err := models.QueryAttrList(db,itemId)
+
+	if err != nil {
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeQueryTransactions, err.Error()), nil)
+		return
+	}
+
+	var res struct {
+		*models.Dataitem
+		attrs          []*models.Attribute  `json:"attrs"`
+	}
+
+	res.Dataitem = item
+	res.attrs = attrs
+	api.JsonResult(w, http.StatusOK, nil, res)
 }
 
 func DoRecharge(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
