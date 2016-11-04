@@ -33,8 +33,8 @@ type Repository struct {
 	Label         string	`json:"label,omitempty"`
 	CreateUser    string	`json:"createUser,omitempty"`
 	Description   string	`json:"description,omitempty"`
-	CreateTime    time.Time	`json:"createTime,omitempty"`
-	UpdateTime    time.Time	`json:"updateTime,omitempty"`
+	CreateTime    *time.Time	`json:"createTime,omitempty"`
+	UpdateTime    *time.Time	`json:"updateTime,omitempty"`
 	Status	      string	`json:"status,omitempty"`
 }
 
@@ -43,8 +43,8 @@ type Dataitem struct {
 	ItemName     		string		`json:"itemName,omitempty"`
 	RepoName      		string		`json:"repoName,omitempty"`
 	Url	      		string		`json:"url,omitempty"`
-	CreateName	      	time.Time	`json:"createName,omitempty"`
-	UpdateName	      	time.Time	`json:"updateName,omitempty"`
+	CreateName	      	*time.Time	`json:"createName,omitempty"`
+	UpdateName	      	*time.Time	`json:"updateName,omitempty"`
 	Status	      		string		`json:"status,omitempty"`
 	Simple			string		`json:"simple,omitempty"`
 }
@@ -397,7 +397,7 @@ func QueryRepo(db *sql.DB, reponame string)(*Repository, error) {
 	repo := new(Repository)
 
 	err := db.QueryRow(`SELECT
-		REPO_ID
+		REPO_ID,
 		REPO_NAME,
 		CREATE_USER,
 		DESCRIPTION
@@ -422,14 +422,14 @@ func QueryItemList(db *sql.DB, reponame string)([]*Dataitem, error) {
 	logger.Debug("QueryItemList begin")
 
 	sqlParams := make([]interface{}, 0, 2)
-	sqlwhere := "REPO_NAME=? AND STATUS = ?`"
+	sqlwhere := "REPO_NAME=? AND STATUS = ?"
 	sqlorder := "ORDER BY CREATE_TIME"
 
 	sqlParams = append(sqlParams,reponame)
 	sqlParams = append(sqlParams,"A")
 
 	//count, err := queryItemCount(db, sqlwhere, sqlParams...)
-	items, err := queryItems(db,sqlwhere,sqlorder,sqlParams)
+	items, err := queryItems(db,sqlwhere,sqlorder,sqlParams...)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, err
@@ -443,7 +443,7 @@ func QueryItem(db *sql.DB, repoName,itemName string)(*Dataitem, error) {
 	item := new(Dataitem)
 
 
-	err := db.QueryRow(`SELECT ITEM_ID,ITME_NAME,URL,UPDATE_TIME,SIMPLE
+	err := db.QueryRow(`SELECT ITEM_ID,ITEM_NAME,URL,UPDATE_TIME,SIMPLE
 		FROM DF_DATAITEM
 		WHERE
 		REPO_NAME=? AND ITEM_NAME=? AND STATUS = ?`,
@@ -466,12 +466,12 @@ func QueryAttrList(db *sql.DB, itemId int)([]*Attribute, error) {
 	logger.Debug("QueryAttrList begin")
 
 	sqlParams := make([]interface{}, 0, 2)
-	sqlwhere := "ITEM_ID=?`"
+	sqlwhere := "ITEM_ID=?"
 	sqlorder := "ORDER BY ORDER_ID"
 
 	sqlParams = append(sqlParams,itemId)
 
-	attrs, err := queryAttrs(db,sqlwhere,sqlorder,sqlParams)
+	attrs, err := queryAttrs(db,sqlwhere,sqlorder,sqlParams...)
 
 	if err != nil {
 		logger.Error(err.Error())
@@ -523,7 +523,7 @@ func queryRepos(db *sql.DB, sqlwhere, sqlorder string,limit int,
 		sqlwhereall = fmt.Sprintf("WHERE %s", sqlwhere)
 	}
 	sqlstr := fmt.Sprintf(`SELECT REPO_ID, REPO_NAME,
-		CLASS, LABEL, CREATE_USER, DESCRIPTION, CREATE_TIME, UPDATE_TIME, STATUS
+		CLASS, LABEL, DESCRIPTION
 		FROM DF_REPOSITORY
 		%s
 		%s
@@ -553,6 +553,8 @@ func queryRepos(db *sql.DB, sqlwhere, sqlorder string,limit int,
 		return nil, err
 	}
 
+
+
 	return repos, nil
 }
 
@@ -565,7 +567,7 @@ func queryItems(db *sql.DB, sqlwhere, sqlorder string,sqlParams ...interface{}) 
 	if sqlwhere != "" {
 		sqlwhereall = fmt.Sprintf("where %s", sqlwhere)
 	}
-	sqlstr := fmt.Sprintf(`SELECT ITEM_ID,ITME_NAME,URL
+	sqlstr := fmt.Sprintf(`SELECT ITEM_ID,ITEM_NAME,URL
 		FROM DF_DATAITEM
 		%s
 		%s`,

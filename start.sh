@@ -1,8 +1,8 @@
-export MYSQL_ADDR=localhost
+export MYSQL_ADDR=mysqlnocase.servicebroker.dataos.io
 export MYSQL_PORT=3306
-export MYSQL_DATABASE=trans
-export MYSQL_USER=root
-export MYSQL_PASSWORD=root
+export MYSQL_DATABASE=5a463909d48c1be
+export MYSQL_USER=fe4a203045def76
+export MYSQL_PASSWORD=afb2f77cc86de1d
 export ENV_NAME_MYSQL_ADDR=MYSQL_ADDR
 export ENV_NAME_MYSQL_PORT=MYSQL_PORT
 export ENV_NAME_MYSQL_DATABASE=MYSQL_DATABASE

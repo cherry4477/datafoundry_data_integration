@@ -171,15 +171,14 @@ func QueryRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter.
 		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeQueryTransactions, err.Error()), nil)
 		return
 	}
-
-	var res struct {
+	result := struct {
 		*models.Repository
-		items          []*models.Dataitem  `json:"items"`
+		Items          []*models.Dataitem  `json:"items"`
+	}{
+		repo,
+		items,
 	}
-
-	res.Repository = repo
-	res.items = items
-	api.JsonResult(w, http.StatusOK, nil, res)
+	api.JsonResult(w, http.StatusOK, nil, result)
 }
 
 func QueryDataItemHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
@@ -213,11 +212,11 @@ func QueryDataItemHandler(w http.ResponseWriter, r *http.Request, params httprou
 
 	var res struct {
 		*models.Dataitem
-		attrs          []*models.Attribute  `json:"attrs"`
+		Attrs          []*models.Attribute  `json:"attrs"`
 	}
 
 	res.Dataitem = item
-	res.attrs = attrs
+	res.Attrs = attrs
 	api.JsonResult(w, http.StatusOK, nil, res)
 }
 
