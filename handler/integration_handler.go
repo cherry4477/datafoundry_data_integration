@@ -94,52 +94,52 @@ func CreateRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter
 }
 
 func QueryRepoListHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	//logger.Info("Request url: GET %v.", r.URL)
-	//
-	//logger.Info("Begin get RepoList handler.")
-	//defer logger.Info("End get RepoList handler.")
-	//
-	//db := models.GetDB()
-	//if db == nil {
-	//	logger.Warn("Get db is nil.")
-	//	api.JsonResult(w, http.StatusInternalServerError, api.GetError(api.ErrorCodeDbNotInitlized), nil)
-	//	return
-	//}
-	//
-	//r.ParseForm()
-	//
-	//offset, size := api.OptionalOffsetAndSize(r, 30, 1, 1000)
-	//orderBy := models.ValidateOrderBy(r.Form.Get("orderby"))
-	//class := r.Form.Get("class")
-	//label := r.Form.Get("label")
-	//reponame := r.Form.Get("reponame")
-	//
-	//count, repos, err := models.QueryRepoList(db, class, label, reponame, orderBy, offset, size)
-	//if err != nil {
-	//	api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeQueryTransactions, err.Error()), nil)
-	//	return
-	//}
-	//api.JsonResult(w, http.StatusOK, nil, api.NewQueryListResult(count, repos))
-	data := `{
-			"total":2,
-			"results":[
-			{
-				"repo_name":"北京空气质量",
-				"class":"气象环保",
-				"label":"公开数据",
-				"description":"北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。"
+	logger.Info("Request url: GET %v.", r.URL)
 
-			},
-			{
-				"repo_name":"上海空气质量",
-				"class":"气象环保",
-				"label":"公开数据",
-				"description":"北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。"
-			}
-			]
-		}`
+	logger.Info("Begin get RepoList handler.")
+	defer logger.Info("End get RepoList handler.")
 
-	api.JsonResult(w, http.StatusOK, api.GetError(api.ErrorCodeNone), data)
+	db := models.GetDB()
+	if db == nil {
+		logger.Warn("Get db is nil.")
+		api.JsonResult(w, http.StatusInternalServerError, api.GetError(api.ErrorCodeDbNotInitlized), nil)
+		return
+	}
+
+	r.ParseForm()
+
+	offset, size := api.OptionalOffsetAndSize(r, 30, 1, 1000)
+	orderBy := models.ValidateOrderBy(r.Form.Get("orderby"))
+	class := r.Form.Get("class")
+	label := r.Form.Get("label")
+	reponame := r.Form.Get("reponame")
+
+	count, repos, err := models.QueryRepoList(db, class, label, reponame, orderBy, offset, size)
+	if err != nil {
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeQueryTransactions, err.Error()), nil)
+		return
+	}
+	api.JsonResult(w, http.StatusOK, nil, api.NewQueryListResult(count, repos))
+	//data := `{
+	//		"total":2,
+	//		"results":[
+	//		{
+	//			"repo_name":"北京空气质量",
+	//			"class":"气象环保",
+	//			"label":"公开数据",
+	//			"description":"北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。"
+	//
+	//		},
+	//		{
+	//			"repo_name":"上海空气质量",
+	//			"class":"气象环保",
+	//			"label":"公开数据",
+	//			"description":"北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。北京、上海、广州的空气质量数据，数据按月周期生成，数据详细粒度到小时。"
+	//		}
+	//		]
+	//	}`
+	//
+	//api.JsonResult(w, http.StatusOK, api.GetError(api.ErrorCodeNone), data)
 }
 
 func QueryRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
