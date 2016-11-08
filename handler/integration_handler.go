@@ -58,6 +58,13 @@ func CreateRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter
 	logger.Info("Begin do CreateRepo handler.")
 	defer logger.Info("End do recharge handler.")
 
+	token := r.Header.Get("Authorization")
+
+	if _, err := getDFUserame(token); err != nil {
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeAuthFailed, err.Error()), nil)
+		return
+	}
+
 	db := models.GetDB()
 	if db == nil {
 		logger.Warn("Get db is nil.")
@@ -91,6 +98,13 @@ func QueryRepoListHandler(w http.ResponseWriter, r *http.Request, params httprou
 	logger.Info("Begin get RepoList handler.")
 	defer logger.Info("End get RepoList handler.")
 
+	token := r.Header.Get("Authorization")
+
+	if _, err := getDFUserame(token); err != nil {
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeAuthFailed, err.Error()), nil)
+		return
+	}
+
 	db := models.GetDB()
 	if db == nil {
 		logger.Warn("Get db is nil.")
@@ -121,6 +135,13 @@ func QueryRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter.
 
 	logger.Info("Begin get Repo handler.")
 	defer logger.Info("End get Repo handler.")
+
+	token := r.Header.Get("Authorization")
+
+	if _, err := getDFUserame(token); err != nil {
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeAuthFailed, err.Error()), nil)
+		return
+	}
 
 	db := models.GetDB()
 	if db == nil {
@@ -160,6 +181,13 @@ func QueryDataItemHandler(w http.ResponseWriter, r *http.Request, params httprou
 
 	logger.Info("Begin get DataItem handler.")
 	defer logger.Info("End get DataItem handler.")
+
+	token := r.Header.Get("Authorization")
+
+	if _, err := getDFUserame(token); err != nil {
+		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeAuthFailed, err.Error()), nil)
+		return
+	}
 
 	db := models.GetDB()
 	if db == nil {
