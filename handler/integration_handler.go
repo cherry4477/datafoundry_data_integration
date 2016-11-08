@@ -183,12 +183,13 @@ func QueryDataItemHandler(w http.ResponseWriter, r *http.Request, params httprou
 		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeQueryAttribute, err.Error()), nil)
 		return
 	}
-
+	repo,err := models.QueryRepo(db,repoName)
 	var res struct {
 		*models.Dataitem
+		CreateUser string	   `json:"createUser"`
 		Attrs []*models.Attribute  `json:"attrs"`
 	}
-
+	res.CreateUser = repo.CreateUser
 	res.Dataitem = item
 	res.Attrs = attrs
 	api.JsonResult(w, http.StatusOK, nil, res)
