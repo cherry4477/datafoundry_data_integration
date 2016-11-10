@@ -15,7 +15,8 @@ const (
 
 type Repository struct {
 	RepoId      int        `json:"repoId,omitempty"`
-	RepoName    string     `json:"repoName,omitempty"`
+	RepoName    string     `json:"repoName"`
+	ChRepoName  string     `json:"chRepoName"`
 	Class       string     `json:"class,omitempty"`
 	Label       string     `json:"label,omitempty"`
 	CreateUser  string     `json:"createUser,omitempty"`
@@ -28,8 +29,8 @@ type Repository struct {
 
 type Dataitem struct {
 	ItemId     int        `json:"itemId,omitempty"`
-	ItemName   string     `json:"itemName,omitempty"`
-	RepoName   string     `json:"repoName,omitempty"`
+	ItemName   string     `json:"itemName"`
+	RepoName   string     `json:"repoName"`
 	Url        string     `json:"url,omitempty"`
 	CreateTime *time.Time `json:"createTime,omitempty"`
 	UpdateTime *time.Time `json:"updateTime,omitempty"`
@@ -90,14 +91,14 @@ func RecordRepo(db *sql.DB, repositoryInfo *Repository) error {
 
 	nowstr := time.Now().Format("2006-01-02 15:04:05.999999")
 	sqlstr := fmt.Sprintf(`insert into DF_REPOSITORY (
-				REPO_NAME, CLASS, LABEL, CREATE_USER, DESCRIPTION,
+				REPO_NAME, CH_REPO_NAME, CLASS, LABEL, CREATE_USER, DESCRIPTION,
 				CREATE_TIME, UPDATE_TIME, STATUS
 				) values (
 				?, ?, ?, ?, ?,
 				'%s', '%s', ? )`,
 		nowstr, nowstr)
 	_, err := db.Exec(sqlstr,
-		repositoryInfo.RepoName, repositoryInfo.Class, repositoryInfo.Label,
+		repositoryInfo.RepoName, repositoryInfo.ChRepoName, repositoryInfo.Class, repositoryInfo.Label,
 		repositoryInfo.CreateUser, repositoryInfo.Description, repositoryInfo.Status)
 	return err
 
@@ -297,7 +298,7 @@ func queryRepos(db *sql.DB, sqlwhere, sqlorder string, limit int,
 		sqlwhereall = fmt.Sprintf("WHERE %s", sqlwhere)
 	}
 	sqlstr := fmt.Sprintf(`SELECT REPO_ID, REPO_NAME,
-		CLASS, LABEL, DESCRIPTION, IMAGE_URL
+		CH_REPO_NAME, CLASS, LABEL, DESCRIPTION, IMAGE_URL
 		FROM DF_REPOSITORY
 		%s
 		%s
@@ -317,7 +318,7 @@ func queryRepos(db *sql.DB, sqlwhere, sqlorder string, limit int,
 	repos := make([]*Repository, 0, 32)
 	for rows.Next() {
 		repo := &Repository{}
-		err := rows.Scan(&repo.RepoId, &repo.RepoName, &repo.Class, &repo.Label, &repo.Description, &repo.ImageUrl)
+		err := rows.Scan(&repo.RepoId, &repo.RepoName, &repo.ChRepoName, &repo.Class, &repo.Label, &repo.Description, &repo.ImageUrl)
 		if err != nil {
 			return nil, err
 		}
