@@ -29,15 +29,17 @@ const (
 	ErrorCodeAuthFailed        = 1305
 	ErrorCodePermissionDenied  = 1306
 	ErrorCodeInvalidParameters = 1307
-	ErrorCodeRecordRecharge    = 1308
+	ErrorCodeRecordRepository  = 1308
 	ErrorCodeUpdateBalance     = 1309
 	ErrorCodeModifyApp         = 1310
 	ErrorCodeGetApp            = 1311
-	ErrorCodeQueryTransactions = 1312
+	ErrorCodeQueryRepositorys  = 1312
 	ErrorCodeGetAiPayMsg       = 1313
 	ErrorCodeAmountsInvalid    = 1314
 	ErrorCodeAmountsNegative   = 1315
 	ErrorCodeAmountsTooBig     = 1316
+	ErrorCodeQueryDataitemss   = 1317
+	ErrorCodeQueryAttribute    = 1317
 
 	NumErrors = 1500 // about 12k memroy wasted
 )
@@ -54,15 +56,17 @@ func init() {
 	initError(ErrorCodePermissionDenied, "permission denied")
 	initError(ErrorCodeInvalidParameters, "invalid parameters")
 
-	initError(ErrorCodeRecordRecharge, "failed to record recharge")
+	initError(ErrorCodeRecordRepository, "failed to record repository")
 	initError(ErrorCodeUpdateBalance, "failed to update balance")
 	initError(ErrorCodeModifyApp, "failed to modify app")
 	initError(ErrorCodeGetApp, "failed to retrieve app")
-	initError(ErrorCodeQueryTransactions, "failed to query transactions")
+	initError(ErrorCodeQueryRepositorys, "failed to query repositorys")
 	initError(ErrorCodeGetAiPayMsg, "failed to get aipay message")
 	initError(ErrorCodeAmountsInvalid, "recharge amount has more than two decimals")
 	initError(ErrorCodeAmountsNegative, "recharge amount is negative")
 	initError(ErrorCodeAmountsTooBig, "recharge amount is too big")
+	initError(ErrorCodeQueryDataitemss, "failed to query dataitems")
+	initError(ErrorCodeQueryAttribute, "failed to query attributes")
 
 	ErrorNone = GetError(ErrorCodeNone)
 	ErrorUnkown = GetError(ErrorCodeUnkown)
