@@ -27,34 +27,35 @@ type Transaction struct {
 	StatusTime    time.Time `json:"statustime,omitempty"`
 }
 type Repository struct {
-	RepoId        int	`json:"repoId,omitempty"`
-	RepoName      string	`json:"repoName,omitempty"`
-	Class	      string	`json:"class,omitempty"`
-	Label         string	`json:"label,omitempty"`
-	CreateUser    string	`json:"createUser,omitempty"`
-	Description   string	`json:"description,omitempty"`
-	CreateTime    *time.Time	`json:"createTime,omitempty"`
-	UpdateTime    *time.Time	`json:"updateTime,omitempty"`
-	Status	      string	`json:"status,omitempty"`
+	RepoId      int        `json:"repoId,omitempty"`
+	RepoName    string     `json:"repoName,omitempty"`
+	ChRepoName  string     `json:"chRepoName,omitempty"`
+	Class       string     `json:"class,omitempty"`
+	Label       string     `json:"label,omitempty"`
+	CreateUser  string     `json:"createUser,omitempty"`
+	Description string     `json:"description,omitempty"`
+	CreateTime  *time.Time `json:"createTime,omitempty"`
+	UpdateTime  *time.Time `json:"updateTime,omitempty"`
+	Status      string     `json:"status,omitempty"`
 }
 
 type Dataitem struct {
-	ItemId			int		`json:"itemId,omitempty"`
-	ItemName     		string		`json:"itemName,omitempty"`
-	RepoName      		string		`json:"repoName,omitempty"`
-	Url	      		string		`json:"url,omitempty"`
-	CreateName	      	*time.Time	`json:"createName,omitempty"`
-	UpdateName	      	*time.Time	`json:"updateName,omitempty"`
-	Status	      		string		`json:"status,omitempty"`
-	Simple			string		`json:"simple,omitempty"`
+	ItemId     int        `json:"itemId,omitempty"`
+	ItemName   string     `json:"itemName,omitempty"`
+	RepoName   string     `json:"repoName,omitempty"`
+	Url        string     `json:"url,omitempty"`
+	CreateName *time.Time `json:"createName,omitempty"`
+	UpdateName *time.Time `json:"updateName,omitempty"`
+	Status     string     `json:"status,omitempty"`
+	Simple     string     `json:"simple,omitempty"`
 }
 
 type Attribute struct {
-	ATTR_ID		int		`json:"attrId,omitempty"`
-	ITEM_ID		int		`json:"itemId,omitempty"`
-	ATTR_NAME	string		`json:"attrName,omitempty"`
-	INSTRUCTION	string		`json:"instruction,omitempty"`
-	ORDER_ID	int		`json:"orderId,omitempty"`
+	ATTR_ID     int    `json:"attrId,omitempty"`
+	ITEM_ID     int    `json:"itemId,omitempty"`
+	ATTR_NAME   string `json:"attrName,omitempty"`
+	INSTRUCTION string `json:"instruction,omitempty"`
+	ORDER_ID    int    `json:"orderId,omitempty"`
 }
 
 func RecordRecharge(db *sql.DB, rechargeInfo *Transaction) error {
@@ -322,14 +323,14 @@ func RecordRepo(db *sql.DB, repositoryInfo *Repository) error {
 				'%s', '%s', ? )`,
 		nowstr, nowstr)
 	_, err := db.Exec(sqlstr,
-		repositoryInfo.RepoName,repositoryInfo.Class,repositoryInfo.Label,
-		repositoryInfo.CreateUser,repositoryInfo.Description,repositoryInfo.Status)
+		repositoryInfo.RepoName, repositoryInfo.Class, repositoryInfo.Label,
+		repositoryInfo.CreateUser, repositoryInfo.Description, repositoryInfo.Status)
 	return err
 
 }
 
 func QueryRepoList(db *sql.DB, class, label, reponame, orderBy string,
-offset int64, limit int)(int64, []*Repository, error) {
+	offset int64, limit int) (int64, []*Repository, error) {
 
 	logger.Debug("QueryRepoList begin")
 
@@ -364,7 +365,7 @@ offset int64, limit int)(int64, []*Repository, error) {
 
 	if sqlwhere == "" {
 		sqlwhere = "STATUS=?"
-	}else{
+	} else {
 		sqlwhere = sqlwhere + " and STATUS=?"
 	}
 	sqlParams = append(sqlParams, "A")
@@ -392,7 +393,7 @@ offset int64, limit int)(int64, []*Repository, error) {
 	return count, repos, nil
 }
 
-func QueryRepo(db *sql.DB, reponame string)(*Repository, error) {
+func QueryRepo(db *sql.DB, reponame string) (*Repository, error) {
 	logger.Debug("QueryRepoList begin")
 	repo := new(Repository)
 
@@ -404,7 +405,7 @@ func QueryRepo(db *sql.DB, reponame string)(*Repository, error) {
 		FROM DF_REPOSITORY
 		WHERE
 		REPO_NAME=? AND STATUS = ?`,
-		reponame,"A").Scan(
+		reponame, "A").Scan(
 		&repo.RepoId,
 		&repo.RepoName,
 		&repo.CreateUser,
@@ -418,18 +419,18 @@ func QueryRepo(db *sql.DB, reponame string)(*Repository, error) {
 	return repo, nil
 }
 
-func QueryItemList(db *sql.DB, reponame string)([]*Dataitem, error) {
+func QueryItemList(db *sql.DB, reponame string) ([]*Dataitem, error) {
 	logger.Debug("QueryItemList begin")
 
 	sqlParams := make([]interface{}, 0, 2)
 	sqlwhere := "REPO_NAME=? AND STATUS = ?"
 	sqlorder := "ORDER BY CREATE_TIME"
 
-	sqlParams = append(sqlParams,reponame)
-	sqlParams = append(sqlParams,"A")
+	sqlParams = append(sqlParams, reponame)
+	sqlParams = append(sqlParams, "A")
 
 	//count, err := queryItemCount(db, sqlwhere, sqlParams...)
-	items, err := queryItems(db,sqlwhere,sqlorder,sqlParams...)
+	items, err := queryItems(db, sqlwhere, sqlorder, sqlParams...)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, err
@@ -438,16 +439,15 @@ func QueryItemList(db *sql.DB, reponame string)([]*Dataitem, error) {
 	return items, nil
 }
 
-func QueryItem(db *sql.DB, repoName,itemName string)(*Dataitem, error) {
+func QueryItem(db *sql.DB, repoName, itemName string) (*Dataitem, error) {
 	logger.Debug("QueryRepoList begin")
 	item := new(Dataitem)
-
 
 	err := db.QueryRow(`SELECT ITEM_ID,ITEM_NAME,URL,UPDATE_TIME,SIMPLE
 		FROM DF_DATAITEM
 		WHERE
 		REPO_NAME=? AND ITEM_NAME=? AND STATUS = ?`,
-		repoName,itemName,"A").Scan(
+		repoName, itemName, "A").Scan(
 		&item.ItemId,
 		&item.ItemName,
 		&item.Url,
@@ -462,16 +462,16 @@ func QueryItem(db *sql.DB, repoName,itemName string)(*Dataitem, error) {
 	return item, nil
 }
 
-func QueryAttrList(db *sql.DB, itemId int)([]*Attribute, error) {
+func QueryAttrList(db *sql.DB, itemId int) ([]*Attribute, error) {
 	logger.Debug("QueryAttrList begin")
 
 	sqlParams := make([]interface{}, 0, 2)
 	sqlwhere := "ITEM_ID=?"
 	sqlorder := "ORDER BY ORDER_ID"
 
-	sqlParams = append(sqlParams,itemId)
+	sqlParams = append(sqlParams, itemId)
 
-	attrs, err := queryAttrs(db,sqlwhere,sqlorder,sqlParams...)
+	attrs, err := queryAttrs(db, sqlwhere, sqlorder, sqlParams...)
 
 	if err != nil {
 		logger.Error(err.Error())
@@ -512,7 +512,7 @@ func queryItemCount(db *sql.DB, sqlwhere string, sqlParams ...interface{}) (int6
 	return count, err
 }
 
-func queryRepos(db *sql.DB, sqlwhere, sqlorder string,limit int,
+func queryRepos(db *sql.DB, sqlwhere, sqlorder string, limit int,
 	offset int64, sqlParams ...interface{}) ([]*Repository, error) {
 
 	logger.Info("Model begin queryRepos")
@@ -543,7 +543,7 @@ func queryRepos(db *sql.DB, sqlwhere, sqlorder string,limit int,
 	repos := make([]*Repository, 0, 32)
 	for rows.Next() {
 		repo := &Repository{}
-		err := rows.Scan(&repo.RepoId, &repo.RepoName, &repo.Class, &repo.Label,&repo.Description)
+		err := rows.Scan(&repo.RepoId, &repo.RepoName, &repo.Class, &repo.Label, &repo.Description)
 		if err != nil {
 			return nil, err
 		}
@@ -553,12 +553,10 @@ func queryRepos(db *sql.DB, sqlwhere, sqlorder string,limit int,
 		return nil, err
 	}
 
-
-
 	return repos, nil
 }
 
-func queryItems(db *sql.DB, sqlwhere, sqlorder string,sqlParams ...interface{}) ([]*Dataitem, error) {
+func queryItems(db *sql.DB, sqlwhere, sqlorder string, sqlParams ...interface{}) ([]*Dataitem, error) {
 
 	logger.Info("Model begin queryRepos")
 	defer logger.Info("Model end queryRepos")
@@ -585,7 +583,7 @@ func queryItems(db *sql.DB, sqlwhere, sqlorder string,sqlParams ...interface{}) 
 	items := make([]*Dataitem, 0, 32)
 	for rows.Next() {
 		item := &Dataitem{}
-		err := rows.Scan(&item.ItemId,&item.ItemName, &item.Url)
+		err := rows.Scan(&item.ItemId, &item.ItemName, &item.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -598,7 +596,7 @@ func queryItems(db *sql.DB, sqlwhere, sqlorder string,sqlParams ...interface{}) 
 	return items, nil
 }
 
-func queryAttrs(db *sql.DB, sqlwhere, sqlorder string,sqlParams ...interface{}) ([]*Attribute, error) {
+func queryAttrs(db *sql.DB, sqlwhere, sqlorder string, sqlParams ...interface{}) ([]*Attribute, error) {
 
 	logger.Info("Model begin queryAttrs")
 	defer logger.Info("Model end queryAttrs")
@@ -625,7 +623,7 @@ func queryAttrs(db *sql.DB, sqlwhere, sqlorder string,sqlParams ...interface{}) 
 	attrs := make([]*Attribute, 0, 32)
 	for rows.Next() {
 		attr := &Attribute{}
-		err := rows.Scan(&attr.ATTR_NAME,&attr.INSTRUCTION,&attr.ORDER_ID)
+		err := rows.Scan(&attr.ATTR_NAME, &attr.INSTRUCTION, &attr.ORDER_ID)
 		if err != nil {
 			return nil, err
 		}
