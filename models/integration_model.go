@@ -175,6 +175,7 @@ func QueryRepo(db *sql.DB, reponame string) (*Repository, error) {
 	err := db.QueryRow(`SELECT
 		REPO_ID,
 		REPO_NAME,
+		CH_REPO_NAME,
 		CREATE_USER,
 		DESCRIPTION
 		FROM DF_REPOSITORY
@@ -183,6 +184,7 @@ func QueryRepo(db *sql.DB, reponame string) (*Repository, error) {
 		reponame, "A").Scan(
 		&repo.RepoId,
 		&repo.RepoName,
+		&repo.ChRepoName,
 		&repo.CreateUser,
 		&repo.Description)
 
