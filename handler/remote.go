@@ -25,7 +25,7 @@ type User struct {
 	Groups []string `json:"groups"`
 }
 
-const DataFoundryHost = "https://dev.dataos.io:8443"
+const DataFoundryHost = "https://10.1.130.134:8443"
 
 func authDF(token string) (*User, error) {
 	url := fmt.Sprintf("%s/oapi/v1/users/~", DataFoundryHost)
