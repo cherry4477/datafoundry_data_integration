@@ -7,17 +7,19 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"math/rand"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 )
 
 const (
 	TransTypeDEDUCTION = "deduction"
-	TransTypeRECHARGE = "recharge"
+	TransTypeRECHARGE  = "recharge"
 
 	letterBytes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
-var AdminUsers = []string{"admin", "datafoundry"}
+var AdminUsers = make([]string, 0)
 
 type Aipayrecharge struct {
 	Order_id  string  `json:"order_id"`
@@ -50,6 +52,8 @@ type NotifyResult struct {
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+
+	initAdminUser()
 }
 
 func CreateRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
@@ -168,7 +172,7 @@ func QueryRepoHandler(w http.ResponseWriter, r *http.Request, params httprouter.
 	}
 	result := struct {
 		*models.Repository
-		Items []*models.Dataitem  `json:"items"`
+		Items []*models.Dataitem `json:"items"`
 	}{
 		repo,
 		items,
@@ -211,11 +215,11 @@ func QueryDataItemHandler(w http.ResponseWriter, r *http.Request, params httprou
 		api.JsonResult(w, http.StatusBadRequest, api.GetError2(api.ErrorCodeQueryAttribute, err.Error()), nil)
 		return
 	}
-	repo,err := models.QueryRepo(db,repoName)
+	repo, err := models.QueryRepo(db, repoName)
 	var res struct {
 		*models.Dataitem
-		CreateUser string	   `json:"createUser"`
-		Attrs []*models.Attribute  `json:"attrs"`
+		CreateUser string              `json:"createUser"`
+		Attrs      []*models.Attribute `json:"attrs"`
 	}
 	res.CreateUser = repo.CreateUser
 	res.Dataitem = item
@@ -225,7 +229,7 @@ func QueryDataItemHandler(w http.ResponseWriter, r *http.Request, params httprou
 
 func CheckAmount(amount float64) uint {
 
-	amount = float64(int64(amount * 100)) * 0.01
+	amount = float64(int64(amount*100)) * 0.01
 	/*if (amount*100 - float64(int64(amount*100))) > 0 {
 		logger.Error("%v, %v, %v, %v", api.ErrorCodeAmountsInvalid, amount, amount*100, float64(int(amount*100)))
 		return api.ErrorCodeAmountsInvalid
@@ -241,4 +245,14 @@ func CheckAmount(amount float64) uint {
 	}
 
 	return api.ErrorCodeNone
+}
+
+func initAdminUser() {
+	admins := os.Getenv("ADMINUSERS")
+	if admins == "" {
+		logger.Warn("Not set admin users.")
+	}
+	admins = strings.TrimSpace(admins)
+	AdminUsers = strings.Split(admins, " ")
+	logger.Info("Admin users: %v.", AdminUsers)
 }

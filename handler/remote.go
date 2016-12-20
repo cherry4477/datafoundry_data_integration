@@ -3,9 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-
 	"github.com/asiainfoLDP/datafoundry_data_integration/common"
+	"net/http"
+	"os"
 )
 
 type ObjectMeta struct {
@@ -25,7 +25,10 @@ type User struct {
 	Groups []string `json:"groups"`
 }
 
-const DataFoundryHost = "https://10.1.130.134:8443"
+var (
+	DataFoundryHost = os.Getenv("DataFoundryRegionOneHost")
+	//DataFoundryHost2 = os.Getenv("DataFoundryRegionTwoHost")
+)
 
 func authDF(token string) (*User, error) {
 	url := fmt.Sprintf("%s/oapi/v1/users/~", DataFoundryHost)
